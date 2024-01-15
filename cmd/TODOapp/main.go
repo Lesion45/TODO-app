@@ -2,7 +2,7 @@ package main
 
 import (
 	"TODOapp/internal/config"
-	"fmt"
+	st "TODOapp/internal/storage/redis"
 	"github.com/go-chi/chi/v5"
 	"log/slog"
 	"net/http"
@@ -11,19 +11,25 @@ import (
 
 func main() {
 	cfg := config.MustLoad()
-	fmt.Println(cfg)
 
 	log := setupLogger(cfg.Env)
 	log = log.With(slog.String("env", cfg.Env))
 	log.Info("initializing server", slog.String("address", cfg.Server.Address))
 	log.Debug("logger debug mode enabled")
 
-	//TODO: STORAGE
+	log.Info("initializing redis")
+	redisClient := st.NewRedisClient()
+	err := redisClient.IsRunning()
+	if err != nil {
+		log.Error("failed to initialize storage", err)
+		os.Exit(1)
+	}
+	log.Info("connected to redis")
 
-	//TODO: ROUTER
+	//TODO: ROUTERS
 	router := chi.NewRouter()
 
-	//TODO: RUN SERVER
+	log.Info("server is starting")
 	server := &http.Server{
 		Addr:         cfg.Server.Address,
 		Handler:      router,
