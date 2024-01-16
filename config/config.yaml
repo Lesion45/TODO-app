@@ -2,6 +2,6 @@ env: "local" # options: local, dev, prod
 storage-path: "None" # TODO: ADD STORAGE PATH!!!
 
 http-server:
-  address: "localhost:5000"
+  address: "localhost:2000"
   timeout: 10s
   idle-timeout: 60s

@@ -2,8 +2,10 @@ package main
 
 import (
 	"TODOapp/internal/config"
+	"TODOapp/internal/http-server/handlers/task/add"
 	st "TODOapp/internal/storage/redis"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"log/slog"
 	"net/http"
 	"os"
@@ -29,15 +31,18 @@ func main() {
 	//TODO: ROUTERS
 	router := chi.NewRouter()
 
+	router.Use(middleware.RequestID)
+
+	router.Post("/task", add.New(log, redisClient))
+
 	log.Info("server is starting")
 	server := &http.Server{
-		Addr:         cfg.Server.Address,
+		Addr:         "localhost:2000",
 		Handler:      router,
 		ReadTimeout:  cfg.Server.TimeOut,
 		WriteTimeout: cfg.Server.TimeOut,
 		IdleTimeout:  cfg.Server.IdleTimeOut,
 	}
-
 	if err := server.ListenAndServe(); err != nil {
 		log.Error("failed to start server")
 	}

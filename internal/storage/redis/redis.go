@@ -21,7 +21,8 @@ func NewRedisClient() *Storage {
 }
 
 func (s *Storage) IsRunning() error {
-	err := s.cl.Ping()
+	err := s.cl.Ping().Err()
+	fmt.Println(err)
 	if err != nil {
 		return fmt.Errorf("%s", err)
 	}
@@ -32,21 +33,24 @@ func (s *Storage) IsRunning() error {
 func (s *Storage) AddTask(uuid string, task string) error {
 	const op = "storage.redis.AddTask"
 
-	err := s.cl.Set(uuid, task, defExpTime)
+	err := s.cl.Set(uuid, task, defExpTime).Err()
 	if err != nil {
 		return fmt.Errorf("%s: %s", op, err)
 	}
 	return nil
 }
 
-// TODO: REVIEW ERRORS
 func (s *Storage) GetTask(uuid string) (string, error) {
 	fmt.Println(s.cl.Keys("*").Result())
 	const op = "storage.redis.GetTask"
 
 	val, err := s.cl.Get(uuid).Result()
 	if err != nil {
-		return "", fmt.Errorf("%s: %w", op, err)
+		if err == redis.Nil {
+			return "", nil
+		} else {
+			return "", fmt.Errorf("%s: %w", op, err)
+		}
 	}
 
 	return val, nil
