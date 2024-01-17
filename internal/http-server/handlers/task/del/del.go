@@ -1,4 +1,4 @@
-package add
+package del
 
 import (
 	"TODOapp/internal/lib/api/response"
@@ -19,13 +19,13 @@ type Request struct {
 	Task string `json:"task" validate:"required"`
 }
 
-type TASKAdder interface {
-	AddTask(uuid string, taskToSave string) error
+type TASKDeletter interface {
+	DeleteTask(uuid string, taskToDelete string) error
 }
 
-func New(log *slog.Logger, taskSave TASKAdder) http.HandlerFunc {
+func New(log *slog.Logger, taskDelete TASKDeletter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		const op = "handlers.task.add.New"
+		const op = "handlers.task.delete.New"
 
 		log.With(slog.String("op", op),
 			slog.String("request_id", middleware.GetReqID(r.Context())),
@@ -55,18 +55,18 @@ func New(log *slog.Logger, taskSave TASKAdder) http.HandlerFunc {
 		}
 
 		uuid := req.Uuid
-		tasks := req.Task
+		task := req.Task
 
-		err = taskSave.AddTask(uuid, tasks)
+		err = taskDelete.DeleteTask(uuid, task)
 		if err != nil {
-			log.Info("failed to add task", sl.Err(err))
+			log.Info("failed to delete task", sl.Err(err))
 
-			render.JSON(w, r, response.Error("failed to add task"))
+			render.JSON(w, r, response.Error("failed to delete task"))
 
 			return
 		}
 
-		log.Info("task added")
+		log.Info("task deleted")
 
 		render.JSON(w, r, Response{
 			Response: response.OK(),

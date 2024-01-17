@@ -9,15 +9,15 @@ import (
 )
 
 type Config struct {
-	Env         string `yaml:"env"`
-	StoragePath string `yaml:"storage-path" env-required:"true"`
-	Server      HTTPServer
+	Env         string     `yaml:"env"`
+	StoragePath string     `yaml:"storage-path" env-required:"true"`
+	Server      HTTPServer `yaml:"http-server"`
 }
 
 type HTTPServer struct {
-	Address     string        `yaml:"address"`
-	TimeOut     time.Duration `yaml:"timeout"`
-	IdleTimeOut time.Duration `yaml:"idle-timeout"`
+	Address     string        `yaml:"address" env-default:"localhost:2000"`
+	TimeOut     time.Duration `yaml:"timeout" env-default:"4s"`
+	IdleTimeOut time.Duration `yaml:"idle-timeout" env-default:"60s"`
 }
 
 func MustLoad() *Config {
