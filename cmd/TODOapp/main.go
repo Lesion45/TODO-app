@@ -4,6 +4,7 @@ import (
 	"TODOapp/internal/config"
 	"TODOapp/internal/http-server/handlers/task/add"
 	"TODOapp/internal/http-server/handlers/task/del"
+	"TODOapp/internal/http-server/handlers/task/get"
 	st "TODOapp/internal/storage/redis"
 	"fmt"
 	"github.com/go-chi/chi/v5"
@@ -38,6 +39,7 @@ func main() {
 
 	router.Post("/task/add", add.New(log, redisClient))
 	router.Post("/task/delete", del.New(log, redisClient))
+	router.Get("/task/get", get.New(log, redisClient))
 
 	log.Info("server is starting")
 	server := &http.Server{
